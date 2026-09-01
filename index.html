@@ -5,56 +5,96 @@
 <meta name="viewport" content="width=device-width,initial-scale=1,maximum-scale=1,user-scalable=no">
 <title>我的训练计时器</title>
 <style>
+  /* =========================================================
+     配色：晨光活力（白底 + 活力橙）
+     想换主色只改 --pri 这一个值即可，整站会跟着变
+     ========================================================= */
+  :root{
+    --pri:#FF6B35;        /* 主色 活力橙 */
+    --pri-soft:#FFF1EA;   /* 主色浅底 */
+    --pri-dark:#E85A2A;
+    --bg:#FAF9F7;         /* 页面底色 暖白 */
+    --card:#FFFFFF;
+    --line:#EDEBE6;       /* 分隔线 */
+    --line2:#E3E0D8;
+    --tx:#1F2430;         /* 主文字 */
+    --tx2:#6B7280;        /* 次要文字 */
+    --tx3:#9CA3AF;
+    --green:#12A150; --green-bg:#E6F7EE;
+    --blue:#2F6FED;  --blue-bg:#E8F2FF;
+    --purple:#7C4DFF;--purple-bg:#F3EDFF;
+    --red:#E5484D;   --red-bg:#FDECEC;
+  }
   *{box-sizing:border-box;-webkit-tap-highlight-color:transparent}
-  body{margin:0;background:#0f1115;color:#e8eaed;font-family:-apple-system,BlinkMacSystemFont,"PingFang SC","Microsoft YaHei",sans-serif;font-size:16px}
+  body{margin:0;background:var(--bg);color:var(--tx);font-family:-apple-system,BlinkMacSystemFont,"PingFang SC","Microsoft YaHei",sans-serif;font-size:16px}
   .wrap{max-width:520px;margin:0 auto;padding:16px 14px 40px}
-  h1{font-size:20px;margin:4px 0 2px}
-  .sub{color:#8b93a7;font-size:13px;margin-bottom:16px}
-  .groupTitle{color:#7c85a0;font-size:12px;letter-spacing:1px;margin:18px 0 8px;text-transform:uppercase}
-  .card{background:#191d26;border:1px solid #262b36;border-radius:14px;padding:14px;margin-bottom:10px;cursor:pointer;transition:.15s}
-  .card:active{background:#212632;transform:scale(.99)}
-  .card .t{font-size:16px;font-weight:600}
-  .card .d{color:#8b93a7;font-size:13px;margin-top:5px;line-height:1.5}
-  .btn{display:block;width:100%;padding:15px;border-radius:14px;border:none;font-size:16px;font-weight:600;cursor:pointer;margin-bottom:10px;font-family:inherit}
-  .btn.pri{background:#4f7cff;color:#fff}
-  .btn.sec{background:#252a36;color:#cfd6e6}
-  .btn.ghost{background:transparent;color:#8b93a7;border:1px solid #2c3240}
-  .btn.warn{background:#3a2b2b;color:#ff9b9b}
-  .btn:active{opacity:.8}
+  h1{font-size:21px;margin:4px 0 2px;font-weight:800;letter-spacing:-.3px}
+  .sub{color:var(--tx2);font-size:13px;margin-bottom:16px}
+  .groupTitle{color:var(--pri);font-size:12px;font-weight:700;letter-spacing:.5px;margin:20px 0 8px}
+  .card{background:var(--card);border:1px solid var(--line);border-radius:16px;padding:14px;margin-bottom:10px;cursor:pointer;transition:.15s;box-shadow:0 2px 8px rgba(31,36,48,.04)}
+  .card:active{transform:scale(.99);box-shadow:0 1px 4px rgba(31,36,48,.06)}
+  .card .t{font-size:16px;font-weight:700;line-height:1.35}
+  .card .d{color:var(--tx2);font-size:13px;margin-top:5px;line-height:1.55}
+  /* 完成次数徽章 */
+  .badge{display:inline-block;margin-top:7px;padding:3px 9px;border-radius:20px;background:var(--green-bg);color:var(--green);font-size:11.5px;font-weight:700}
+  .badge.none{background:#F3F2EE;color:var(--tx3)}
+  .btn{display:block;width:100%;padding:15px;border-radius:14px;border:none;font-size:16px;font-weight:700;cursor:pointer;margin-bottom:10px;font-family:inherit;transition:.12s}
+  .btn.pri{background:var(--pri);color:#fff;box-shadow:0 3px 10px rgba(255,107,53,.28)}
+  .btn.sec{background:var(--pri-soft);color:var(--pri)}
+  .btn.ghost{background:transparent;color:var(--tx2);border:1px solid var(--line2)}
+  .btn.warn{background:var(--red-bg);color:var(--red)}
+  .btn:active{opacity:.75;transform:scale(.99)}
   .topbar{display:flex;align-items:center;gap:10px;margin-bottom:12px}
-  .topbar .back{background:none;border:none;color:#4f7cff;font-size:16px;padding:6px 0;cursor:pointer;font-family:inherit}
-  .topbar .tt{flex:1;text-align:center;font-size:15px;font-weight:600;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+  .topbar .back{background:none;border:none;color:var(--pri);font-size:16px;font-weight:600;padding:6px 0;cursor:pointer;font-family:inherit}
+  .topbar .tt{flex:1;text-align:center;font-size:15px;font-weight:700;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
   /* 播放页 */
   .stage{text-align:center;padding:6px 0 4px}
-  .kindTag{display:inline-block;padding:4px 12px;border-radius:20px;font-size:12px;font-weight:600;margin-bottom:14px}
-  .k-work{background:#123a2a;color:#4ade80}
-  .k-rest{background:#3a3312;color:#fbbf24}
-  .k-reps{background:#12283a;color:#60a5fa}
-  .k-stop{background:#3a1f33;color:#f472b6}
-  .k-note{background:#2a2a33;color:#a1a1aa}
-  .label{font-size:19px;font-weight:600;margin-bottom:6px;line-height:1.4;min-height:28px}
-  .repsHint{color:#8b93a7;font-size:14px;margin-bottom:10px}
-  .bigNum{font-size:88px;font-weight:800;line-height:1;font-variant-numeric:tabular-nums;letter-spacing:-2px;margin:6px 0 2px}
-  .unit{font-size:13px;color:#8b93a7;margin-bottom:8px}
-  .nextUp{color:#6b7385;font-size:13px;margin-top:6px;min-height:18px}
-  .prog{color:#6b7385;font-size:12px;margin-bottom:14px}
+  .kindTag{display:inline-block;padding:5px 14px;border-radius:20px;font-size:12px;font-weight:800;margin-bottom:14px;letter-spacing:.5px}
+  .k-work{background:var(--pri-soft);color:var(--pri)}
+  .k-rest{background:var(--blue-bg);color:var(--blue)}
+  .k-reps{background:var(--green-bg);color:var(--green)}
+  .k-stop{background:var(--purple-bg);color:var(--purple)}
+  .k-note{background:#F3F2EE;color:var(--tx2)}
+  .label{font-size:20px;font-weight:800;margin-bottom:6px;line-height:1.4;min-height:28px}
+  .repsHint{color:var(--tx2);font-size:14px;margin-bottom:10px}
+  .bigNum{font-size:92px;font-weight:800;line-height:1;font-variant-numeric:tabular-nums;letter-spacing:-3px;margin:6px 0 2px;color:var(--tx)}
+  .bigNum.hot{color:var(--pri)}      /* 最后5秒变橙，余光也能看见 */
+  .unit{font-size:13px;color:var(--tx2);margin-bottom:8px}
+  .nextUp{color:var(--tx3);font-size:13px;margin-top:6px;min-height:18px}
+  .prog{color:var(--tx2);font-size:12px;margin-bottom:14px;background:#fff;border:1px solid var(--line);border-radius:10px;padding:7px 10px;text-align:center}
   .row{display:flex;gap:8px;margin-top:14px}
   .row .btn{margin-bottom:0}
-  .steps{margin-top:20px;border-top:1px solid #262b36;padding-top:12px}
-  .stepItem{display:flex;align-items:center;gap:10px;padding:7px 0;font-size:13px;border-bottom:1px solid #1c202a}
-  .stepItem.cur{color:#fff;font-weight:700}
-  .stepItem .no{color:#5a6273;width:26px;flex:none;font-variant-numeric:tabular-nums}
+  .steps{margin-top:20px;border-top:1px solid var(--line);padding-top:12px}
+  .stepItem{display:flex;align-items:center;gap:10px;padding:7px 0;font-size:13px;border-bottom:1px solid #F6F5F1}
+  .stepItem.cur{color:var(--pri);font-weight:800}
+  .stepItem .no{color:var(--tx3);width:26px;flex:none;font-variant-numeric:tabular-nums}
   .stepItem .nm{flex:1;color:inherit}
-  .stepItem input{width:58px;background:#11141b;border:1px solid #2c3240;color:#cfd6e6;border-radius:6px;padding:4px 6px;font-size:13px;text-align:center;font-family:inherit}
+  .stepItem input{width:58px;background:#fff;border:1px solid var(--line2);color:var(--tx);border-radius:7px;padding:4px 6px;font-size:13px;text-align:center;font-family:inherit}
   .stepItem .tag{font-size:11px;padding:2px 7px;border-radius:10px;flex:none}
-  textarea{width:100%;min-height:210px;background:#11141b;border:1px solid #2c3240;color:#e8eaed;border-radius:12px;padding:12px;font-size:14px;line-height:1.7;font-family:ui-monospace,Menlo,Consolas,monospace;resize:vertical}
-  .hint{background:#151922;border:1px solid #232936;border-radius:12px;padding:12px;font-size:12.5px;color:#98a1b5;line-height:1.75;margin-bottom:12px}
-  .hint code{background:#222836;padding:1px 5px;border-radius:4px;color:#a5d6ff;font-size:12px}
-  .err{background:#3a1f1f;color:#ff9b9b;padding:10px 12px;border-radius:10px;font-size:13px;margin-bottom:10px;display:none}
-  .ok{background:#12331f;color:#7ee2a8;padding:10px 12px;border-radius:10px;font-size:13px;margin-bottom:10px;display:none}
-  .toggleSteps{background:none;border:none;color:#4f7cff;font-size:14px;padding:10px 0;cursor:pointer;font-family:inherit;width:100%}
-  .del{background:none;border:none;color:#6b7385;font-size:12px;cursor:pointer;font-family:inherit;padding:0 4px}
-  .soundRow{display:flex;align-items:center;gap:8px;font-size:13px;color:#8b93a7;margin:10px 0}
+  textarea{width:100%;min-height:190px;background:#fff;border:1px solid var(--line2);color:var(--tx);border-radius:12px;padding:12px;font-size:14px;line-height:1.7;font-family:ui-monospace,Menlo,Consolas,monospace;resize:vertical}
+  .hint{background:#FFFBF5;border:1px solid #FAE5D4;border-radius:12px;padding:12px;font-size:12.5px;color:#6B5B4B;line-height:1.8;margin-bottom:12px}
+  .hint code{background:#fff;border:1px solid #F2DCC8;padding:1px 5px;border-radius:4px;color:var(--pri-dark);font-size:12px}
+  .err{background:var(--red-bg);color:var(--red);padding:10px 12px;border-radius:10px;font-size:13px;margin-bottom:10px;display:none}
+  .ok{background:var(--green-bg);color:var(--green);padding:10px 12px;border-radius:10px;font-size:13px;margin-bottom:10px;display:none}
+  .toggleSteps{background:none;border:none;color:var(--pri);font-size:14px;font-weight:600;padding:10px 0;cursor:pointer;font-family:inherit;width:100%}
+  .del{background:none;border:none;color:var(--tx3);font-size:12px;cursor:pointer;font-family:inherit;padding:0 4px}
+  .soundRow{display:flex;align-items:center;gap:14px;font-size:13px;color:var(--tx2);margin:12px 0;flex-wrap:wrap}
+  .soundRow label{cursor:pointer;user-select:none}
+  /* 记录条目 */
+  .logCard{background:var(--card);border:1px solid var(--line);border-radius:14px;padding:12px;margin-bottom:9px}
+  .logCard .lh{display:flex;align-items:center;gap:8px;margin-bottom:5px}
+  .logCard .ln{font-weight:700;font-size:14.5px;flex:1;line-height:1.35}
+  .st{font-size:11px;font-weight:800;padding:2px 8px;border-radius:20px;flex:none}
+  .st.y{background:var(--green-bg);color:var(--green)}
+  .st.n{background:#FFF4E5;color:#B7791F}
+  .logCard .lm{color:var(--tx2);font-size:12.5px;line-height:1.6}
+  .logCard .lb{display:flex;gap:8px;margin-top:9px}
+  .logCard .lb button{flex:1;padding:8px;border-radius:9px;border:1px solid var(--line2);background:#fff;color:var(--tx2);font-size:12.5px;font-weight:600;cursor:pointer;font-family:inherit}
+  .logCard .lb button.imp{background:var(--pri-soft);color:var(--pri);border:none}
+  .empty{text-align:center;color:var(--tx3);font-size:13.5px;padding:36px 10px;line-height:1.8}
+  .ioBar{display:flex;gap:8px;margin:10px 0}
+  .ioBar .btn{margin-bottom:0}
+  .secTitle{font-size:12px;font-weight:700;color:var(--tx2);margin:16px 0 8px}
 </style>
 </head>
 <body>
@@ -63,14 +103,21 @@
 <!-- ============ 首页 ============ -->
 <section id="home">
   <h1>我的训练计时器</h1>
-  <div class="sub">按周期编排 · 支持次数组 / 计时组 / 力竭秒表</div>
+  <div class="sub">按周期编排 · 次数组 / 计时组 / 力竭秒表</div>
   <div id="presetList"></div>
   <div id="customList"></div>
+
   <button class="btn sec" onclick="go('custom')">＋ 粘贴新计划（计划调整时用）</button>
-  <div class="soundRow">
-    <input type="checkbox" id="soundChk" checked onchange="localStorage.setItem('snd',this.checked?1:0)">
-    <label for="soundChk">提示音</label>
+  <div class="row" style="margin-top:0">
+    <button class="btn ghost" onclick="go('logs')">📊 训练记录</button>
+    <button class="btn ghost" onclick="go('io')">💾 备份 / 恢复</button>
   </div>
+
+  <div class="soundRow">
+    <span><input type="checkbox" id="soundChk" checked onchange="localStorage.setItem('snd',this.checked?1:0)"> <label for="soundChk">提示音</label></span>
+    <span><input type="checkbox" id="voiceChk" checked onchange="localStorage.setItem('voice',this.checked?1:0)"> <label for="voiceChk">语音播报</label></span>
+  </div>
+  <div class="sub" style="margin:0;font-size:12px">语音在休息时播报下一个动作，最后 3 秒念「三、二、一」。锁屏或切后台时可能不响。</div>
 </section>
 
 <!-- ============ 播放页 ============ -->
@@ -104,7 +151,7 @@
   <div class="steps" id="stepsBox" style="display:none"></div>
 </section>
 
-<!-- ============ 自定义页 ============ -->
+<!-- ============ 自定义计划页 ============ -->
 <section id="custom" style="display:none">
   <div class="topbar">
     <button class="back" onclick="go('home')">‹ 返回</button>
@@ -115,13 +162,14 @@
     <b>格式说明</b>（让你聊计划用的 AI 按这个格式输出即可）<br>
     <code># 训练名称</code>　— 第一行写名字<br>
     <code>深蹲 3x12 休60</code>　— 次数组：3组×12次，组间休60秒<br>
-    <code>平板支撑 3x30秒 休60</code>　— 计时组：3组×30秒，组间休60秒<br>
-    <code>单腿臀桥每侧 4x10 休35</code>　— 带「每侧」会左右各来一组<br>
+    <code>平板支撑 3x30秒 休60</code>　— 计时组：3组×30秒<br>
+    <code>开合跳 30秒</code>　— 只做一次（默认1组）<br>
+    <code>单腿臀桥每侧 4x10 休35</code>　— 带「每侧」左右各一组<br>
     <code>平板支撑 力竭</code>　— 秒表模式，正计时<br>
     <code>快走 40分钟</code>　— 单次长计时<br>
-    <code>@循环 5轮 动休15 轮休0</code>　— 开始一个循环块<br>
-    　循环块下面每行写动作：<code>开合跳 30秒</code> 或 <code>深蹲 12次</code><br>
-    也支持 <code>4组12次</code> 这种写法，会自动识别。
+    <code>@循环 5轮 动休15 轮休0</code>　— 循环块，下面每行写动作<br>
+    也支持 <code>4组12次</code> 这种写法。<br>
+    <b>计划同名会自动更新</b>，旧版保留 1 份可回滚，训练记录不受影响。
   </div>
   <div class="err" id="cErr"></div>
   <div class="ok" id="cOk"></div>
@@ -130,11 +178,45 @@
   <button class="btn pri" onclick="savePlan()">保存并开始</button>
 </section>
 
+<!-- ============ 训练记录页 ============ -->
+<section id="logs" style="display:none">
+  <div class="topbar">
+    <button class="back" onclick="go('home')">‹ 返回</button>
+    <div class="tt">训练记录</div>
+    <div style="width:44px"></div>
+  </div>
+  <div class="sub" style="margin-bottom:10px">练完或中途退出都会记录，可一键复制给 AI 用来改进计划。</div>
+  <div id="logList"></div>
+  <button class="btn warn" id="clearLogsBtn" onclick="clearLogs()" style="margin-top:14px">清空全部记录</button>
+</section>
+
+<!-- ============ 备份 / 恢复页 ============ -->
+<section id="io" style="display:none">
+  <div class="topbar">
+    <button class="back" onclick="go('home')">‹ 返回</button>
+    <div class="tt">备份 / 恢复</div>
+    <div style="width:44px"></div>
+  </div>
+  <div class="hint">
+    导出会把「我的自定义计划 + 全部训练记录」打包成一段文本。<br>
+    换手机、清缓存前先导出；换设备后粘贴回来点「导入」即可。<br>
+    分享给朋友也用这个：对方导入就有你的计划。
+  </div>
+  <div class="ioBar">
+    <button class="btn sec" onclick="makeBackup()">生成备份</button>
+    <button class="btn sec" onclick="downloadBackup()">下载文件</button>
+  </div>
+  <textarea id="ioText" placeholder="点「生成备份」后，备份内容会出现在这里；要恢复时，把之前备份的内容整段粘贴进来，再点下面的「导入恢复」。"></textarea>
+  <button class="btn pri" onclick="doImport()">导入恢复</button>
+  <div class="err" id="ioErr"></div>
+  <div class="ok" id="ioOk"></div>
+</section>
+
 </div>
 
 <script>
 /* =========================================================
-   一、数据区：这里放你的训练计划（改这里就能改计划）
+   一、数据区：内置训练计划（改这里就能改计划）
    ========================================================= */
 const PRESETS = [
   {group:'本周 · 温和过渡（08-31 ~ 09-06）', list:[
@@ -312,6 +394,11 @@ function parsePlan(text){
       items.push({k:'reps', name:clean(m[1]), sets:+m[2], reps:+m[3], rest:+(m[4]||0), perSide:per});
       circuit=null; continue;
     }
+    /* 新增容错：只写秒数、不写组数（如「开合跳 30秒」）→ 当作 1 组 */
+    if(m=line.match(/^(.+?)\s*(\d+)\s*秒\s*(?:休\s*(\d+))?$/)){
+      items.push({k:'timed', name:clean(m[1]), sets:1, work:+m[2], rest:+(m[3]||0), perSide:/每侧/.test(m[1])});
+      circuit=null; continue;
+    }
     if(circuit){
       if(m=line.match(/^(.+?)\s*(\d+)\s*秒/)){ circuit.moves.push({name:clean(m[1]), sec:+m[2], perSide:/每侧/.test(m[1])}); continue; }
       if(m=line.match(/^(.+?)\s*(\d+)\s*次/)){ circuit.moves.push({name:clean(m[1]), reps:+m[2], perSide:/每侧/.test(m[1])}); continue; }
@@ -324,10 +411,15 @@ function clean(s){ return s.replace(/[（(]每侧[)）]|每侧/g,'').replace(/^[
 /* =========================================================
    四、播放引擎
    ========================================================= */
-let ST={steps:[], idx:0, run:false, stopDone:false, endAt:0, left:0, elapsed:0, tid:null, wk:null, cur:null};
+let ST={steps:[], idx:0, run:false, stopDone:false, endAt:0, left:0, elapsed:0, tid:null, wk:null, cur:null,
+        startTs:0, planSec:0, saved:false, log:null};
 
 function startWorkout(w){
   ST.steps=expand(w.items); ST.idx=0; ST.run=false; ST.cur=w;
+  ST.stopDone=false; ST.left=0; ST.elapsed=0; ST.saved=false;
+  ST.startTs=Date.now();
+  ST.planSec=estTotal(ST.steps);                 // 原始计划估算时长（调整前）
+  ST.log={skipped:[], adjusted:[], stopwatch:[]};// 本次训练的行为记录
   document.getElementById('pTitle').textContent=w.name;
   go('player'); render(); renderSteps(); lock();
 }
@@ -340,13 +432,16 @@ function render(){
         hint=document.getElementById('pHint'), nxt=document.getElementById('pNext'),
         adj=document.getElementById('pAdj'), main=document.getElementById('pMain');
   document.getElementById('pProg').textContent =
-    '第 '+(ST.idx+1)+' / '+ST.steps.length+' 步 · 剩余约 '+mmss(estLeft())+' / 全程约 '+mmss(estTotal(ST.steps));
+    '第 '+(ST.idx+1)+' / '+ST.steps.length+' 步 · 剩余约 '+mmss(estLeft())+' / 全程约 '+mmss(ST.planSec);
   const map={work:['训练','k-work'],rest:['休息','k-rest'],reps:['次数','k-reps'],stop:['力竭·秒表','k-stop'],note:['提示','k-note']};
   tag.className='kindTag '+map[s.t][1]; tag.textContent=map[s.t][0];
   lab.textContent = s.t==='note' ? '' : s.label;
   hint.textContent = s.sub||'';
   nxt.textContent = ST.steps[ST.idx+1] ? ('下一步：'+(ST.steps[ST.idx+1].label||'').slice(0,24)) : '最后一步';
   adj.style.display = (s.t==='work'||s.t==='rest') ? 'flex' : 'none';
+  // 最后 5 秒数字变橙，余光扫一眼就知道要切换了
+  const leftSec = (s.t==='work'||s.t==='rest') ? Math.ceil((ST.run? (ST.endAt-Date.now()) : ST.left)/1000) : 99;
+  num.className = 'bigNum'+((s.t==='work'||s.t==='rest')&&ST.run&&leftSec<=5?' hot':'');
   if(s.t==='work'||s.t==='rest'){
     num.textContent = fmt(Math.ceil((ST.run? (ST.endAt-Date.now()) : ST.left)/1000));
     unit.textContent='秒'; main.textContent = ST.run?'暂停':'开始';
@@ -365,8 +460,7 @@ function fmt(s){ s=Math.max(0,s|0); const m=Math.floor(s/60), r=s%60;
   return (m>0? (m+':'+(r<10?'0':'')+r) : String(r)); }
 
 /* ===== 时间估算 =====
-   次数组 / 力竭没有固定时长，这里按「每组 45 秒」估算，
-   你觉得不准就改下面这个数字，剩余时间和全程时间会跟着变。            */
+   次数组 / 力竭没有固定时长，按「每组 45 秒」估算，改 REPS_EST 即可。   */
 const REPS_EST = 45;
 function mmss(sec){ sec=Math.max(0,Math.round(sec)); const m=Math.floor(sec/60), s=sec%60;
   return m+':'+(s<10?'0':'')+s; }
@@ -388,51 +482,67 @@ function estLeft(){
 }
 
 /* 让当前步骤开始倒计时。
-   fromTs = 这一步"本该开始的时刻"。传了它，切后台回来才能准确补算，
-   而不是把错过的那段时间白白吃掉。                                   */
+   fromTs = 这一步"本该开始的时刻"，切后台回来靠它准确补算。         */
 function beginCountdown(fromTs){
   const s=cur(); if(!s) return;
   ST.run=true;
-  if(typeof fromTs==='number') ST.endAt = fromTs + s.sec*1000;   // 自动接续：从上一步结束的时刻接着算
+  if(typeof fromTs==='number') ST.endAt = fromTs + s.sec*1000;
   else                         ST.endAt = Date.now() + (ST.left>0 ? ST.left : s.sec*1000);
+  // 进入休息时，提前播报「下一个动作」，让你有时间准备
+  if(s.t==='rest'){
+    const nx=ST.steps[ST.idx+1];
+    if(nx && s.sec>=8) speak('下一个动作，'+shortName(nx.label));
+  }
   clearInterval(ST.tid);
-  let lastBeep=99;
+  let lastTick=99;
   ST.tid=setInterval(()=>{
     const ms=ST.endAt-Date.now();
-    if(ms<=0){                       // 跑完了，把它"本该结束的时刻"往下传，保证补算不丢时间
-      clearInterval(ST.tid); ST.run=false; beep(880,.3);
+    if(ms<=0){
+      clearInterval(ST.tid); ST.run=false; beep(1040,.45);   // 结束长音，更响
       next(true, ST.endAt);
       return;
     }
     const sec=Math.ceil(ms/1000);
-    if(sec<=3 && sec!==lastBeep){ lastBeep=sec; beep(660,.12); }
+    // 最后 5 秒：每秒一滴（最后一滴更长更响）；最后 3 秒叠加语音「三、二、一」
+    if(sec<=5 && sec!==lastTick){
+      lastTick=sec;
+      beep(sec<=1?880:660, sec<=1?.35:.18);
+      if(sec<=3) speak(CN_NUM[sec]||'');
+    }
     render();
   },100);
 }
+const CN_NUM={1:'一',2:'二',3:'三'};
 
 function mainBtn(){
   const s=cur(); if(!s) return;
   audioInit();
-  if(s.t==='reps'){ next(true, Date.now()); return; }   // 做完一组 → 休息自动开始数
+  if(s.t==='reps'){ next(true, Date.now()); return; }
   if(s.t==='note'){ next(true, Date.now()); return; }
-  if(s.t==='stop'){                                     // 力竭秒表
-    if(ST.run){ ST.run=false; clearInterval(ST.tid); ST.stopDone=true; beep(900,.25); }
+  if(s.t==='stop'){
+    if(ST.run){                                   // 秒表停止 → 记下实际秒数
+      ST.run=false; clearInterval(ST.tid); ST.stopDone=true; beep(900,.25);
+      const got=Math.floor(ST.elapsed/1000);
+      ST.log.stopwatch.push({idx:ST.idx, label:s.label, sec:got});
+    }
     else if(ST.stopDone){ ST.stopDone=false; next(true, Date.now()); }
     else { ST.run=true; ST.elapsed=0; const t0=Date.now(); clearInterval(ST.tid);
       ST.tid=setInterval(()=>{ ST.elapsed=Date.now()-t0; render(); },200); }
     render(); return;
   }
-  // 训练 / 休息 倒计时
   if(ST.run) { ST.run=false; ST.left=Math.max(0,ST.endAt-Date.now()); clearInterval(ST.tid); }
   else       { beginCountdown(); }
   render();
 }
 function adj(d){
   const s=cur(); if(!s||(s.t!=='work'&&s.t!=='rest')) return;
+  const before=Math.round((ST.run? (ST.endAt-Date.now()) : ST.left)/1000);
   const curMs = ST.run? (ST.endAt-Date.now()) : ST.left;
   const nv = Math.max(0, curMs + d*1000);
   ST.left=nv; if(ST.run) ST.endAt=Date.now()+nv;
   s.sec = Math.round(nv/1000);
+  // 记下这次调整：原计划 vs 实际，供之后复盘 / 喂给 AI
+  ST.log.adjusted.push({idx:ST.idx, label:s.label, sub:s.sub||'', from:before, to:s.sec, delta:s.sec-before});
   render(); renderSteps();
 }
 function next(auto, fromTs){
@@ -441,24 +551,33 @@ function next(auto, fromTs){
     ST.idx++; ST.left=0; ST.elapsed=0;
     const s=cur();
     render(); renderSteps();
-    // 自动接续：下一步是计时类就直接跑起来；是次数组/秒表/提示则停下等你
     if(auto && (s.t==='work'||s.t==='rest')) beginCountdown(fromTs);
     return;
   }
   // ===== 全部练完 =====
+  finishWorkout(true);
   document.getElementById('pNum').textContent='✓';
   document.getElementById('pLabel').textContent='训练完成！';
   document.getElementById('pUnit').textContent='';
-  document.getElementById('pHint').textContent='';
+  document.getElementById('pHint').textContent='本次记录已保存，可到「训练记录」查看或复制给 AI';
   document.getElementById('pNext').textContent='';
   document.getElementById('pMain').textContent='再来一次';
   document.getElementById('pMain').onclick=()=>{ document.getElementById('pMain').onclick=mainBtn; startWorkout(ST.cur); };
   document.getElementById('pAdj').style.display='none';
   beep(1040,.5);
 }
-function skipStep(){ if(ST.idx < ST.steps.length-1) next(true, Date.now()); }
+function skipStep(){
+  const s=cur(); if(!s) return;
+  ST.log.skipped.push({idx:ST.idx, label:s.label, sub:s.sub||'', sec:s.sec||0, t:s.t});
+  if(ST.idx < ST.steps.length-1) next(true, Date.now());
+}
 function resetAll(){ clearInterval(ST.tid); ST.idx=0; ST.run=false; ST.stopDone=false; ST.left=0; ST.elapsed=0; render(); renderSteps(); }
-function quit(){ clearInterval(ST.tid); ST.run=false; unlock(); go('home'); renderHome(); }
+function quit(){
+  clearInterval(ST.tid); ST.run=false; unlock();
+  // 中途退出也记一笔（「练不动了」正是改计划最重要的信号）
+  if(!ST.saved && ST.steps.length && (ST.idx>0 || ST.log.skipped.length || ST.log.adjusted.length)) finishWorkout(false);
+  go('home'); renderHome();
+}
 
 function renderSteps(){
   const box=document.getElementById('stepsBox'); if(!box) return;
@@ -468,48 +587,165 @@ function renderSteps(){
     let right='';
     if(s.t==='work'||s.t==='rest')
       right='<input type="number" value="'+s.sec+'" onchange="editSec('+i+',this.value)">';
-    else if(s.t==='reps') right='<span style="color:#60a5fa">'+s.reps+'次</span>';
-    else if(s.t==='stop') right='<span style="color:#f472b6">秒表</span>';
-    else right='<span style="color:#a1a1aa">提示</span>';
+    else if(s.t==='reps') right='<span style="color:var(--green);font-weight:700">'+s.reps+'次</span>';
+    else if(s.t==='stop') right='<span style="color:var(--purple);font-weight:700">秒表</span>';
+    else right='<span style="color:var(--tx3)">提示</span>';
     return '<div class="'+cls+'"><span class="no">'+(i+1)+'</span><span class="nm">'+esc(nm)+'</span>'+right+'</div>';
   }).join('');
 }
 function editSec(i,v){
-  const s=ST.steps[i]; s.sec=Math.max(0,parseInt(v)||0);
+  const s=ST.steps[i]; const from=s.sec; s.sec=Math.max(0,parseInt(v)||0);
+  if(from!==s.sec) ST.log.adjusted.push({idx:i, label:s.label, sub:s.sub||'', from:from, to:s.sec, delta:s.sec-from});
   if(i===ST.idx){ ST.left=s.sec*1000; if(ST.run) ST.endAt=Date.now()+ST.left; render(); }
 }
 function toggleSteps(){ const b=document.getElementById('stepsBox');
   b.style.display = b.style.display==='none'?'block':'none'; }
 
 /* =========================================================
-   五、声音 / 常亮 / 工具
+   五、声音 / 语音 / 常亮 / 工具
    ========================================================= */
 let AC=null;
 function audioInit(){ if(!AC){ try{ AC=new (window.AudioContext||window.webkitAudioContext)(); }catch(e){} } }
+function sndOn(){ return localStorage.getItem('snd')!=='0'; }
+function voiceOn(){ return localStorage.getItem('voice')!=='0'; }
 function beep(f,dur){
-  if(localStorage.getItem('snd')==='0') return;
+  if(!sndOn()) return;
   if(!AC) return; let o,g;
   try{ o=AC.createOscillator(); g=AC.createGain(); o.connect(g); g.connect(AC.destination);
-       o.frequency.value=f; o.type='sine'; g.gain.setValueAtTime(.25,AC.currentTime);
-       g.gain.exponentialRampToValueAtTime(.001,AC.currentTime+dur); o.start(); o.stop(AC.currentTime+dur);
+       o.frequency.value=f; o.type='sine';
+       g.gain.setValueAtTime(.6,AC.currentTime);                        // 音量：原 .25 → .6
+       g.gain.exponentialRampToValueAtTime(.001,AC.currentTime+dur);
+       o.start(); o.stop(AC.currentTime+dur);
   }catch(e){}
 }
+/* 中文语音播报（浏览器自带 TTS，不联网、不花钱）
+   注意：iOS 锁屏或切到后台时通常不会出声。                            */
+function speak(text){
+  if(!text || !voiceOn()) return;
+  try{
+    if(!('speechSynthesis' in window)) return;
+    window.speechSynthesis.cancel();
+    const u=new SpeechSynthesisUtterance(text);
+    u.lang='zh-CN'; u.rate=1.15; u.volume=1;
+    window.speechSynthesis.speak(u);
+  }catch(e){}
+}
+function shortName(s){ return String(s||'').replace(/[（(].*?[)）]/g,'').replace(/左$|右$/,'').slice(0,12); }
 let WL=null;
 async function lock(){ try{ if('wakeLock' in navigator && !WL){ WL=await navigator.wakeLock.request('screen'); } }catch(e){} }
 async function unlock(){ try{ if(WL){ await WL.release(); WL=null; } }catch(e){} }
 function esc(s){ return String(s).replace(/[&<>"]/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c])); }
-function go(v){ ['home','player','custom'].forEach(id=>document.getElementById(id).style.display=(id===v?'block':'none')); window.scrollTo(0,0); }
+function go(v){ ['home','player','custom','logs','io'].forEach(id=>{
+    const el=document.getElementById(id); if(el) el.style.display=(id===v?'block':'none'); }); window.scrollTo(0,0); }
+function dtStr(ts){ const d=new Date(ts); const p=n=>(n<10?'0':'')+n;
+  return (d.getMonth()+1)+'/'+d.getDate()+' '+p(d.getHours())+':'+p(d.getMinutes()); }
+function copyText(t){
+  try{ if(navigator.clipboard && navigator.clipboard.writeText){ navigator.clipboard.writeText(t); return true; } }catch(e){}
+  try{ const ta=document.createElement('textarea'); ta.value=t; document.body.appendChild(ta); ta.select();
+       document.execCommand('copy'); document.body.removeChild(ta); return true; }catch(e){ return false; }
+}
 
 /* =========================================================
-   六、首页渲染 / 自定义计划存取
+   六、训练记录：每次训练（含中途退出）都存一条
+   ========================================================= */
+function getLogs(){ try{ return JSON.parse(localStorage.getItem('logs')||'[]'); }catch(e){ return []; } }
+function finishWorkout(completed){
+  if(!ST.cur || ST.saved) return;
+  const done = completed ? ST.steps.length : ST.idx;   // 中途退出：走到第几步算完成几步
+  const rec={
+    id:'L'+Date.now(),
+    planId: ST.cur.id || ('n:'+ST.cur.name),           // 计划改名也不丢记录
+    planName: ST.cur.name,
+    startTs: ST.startTs, endTs: Date.now(),
+    durSec: Math.round((Date.now()-ST.startTs)/1000),
+    planSec: ST.planSec,                                // 原始计划估算时长
+    totalSteps: ST.steps.length,
+    doneSteps: done,
+    completed: completed,
+    skipped: ST.log.skipped.slice(),
+    adjusted: ST.log.adjusted.slice(),
+    stopwatch: ST.log.stopwatch.slice()
+  };
+  const logs=getLogs(); logs.unshift(rec);
+  if(logs.length>100) logs.length=100;                  // 最多留 100 条
+  try{ localStorage.setItem('logs',JSON.stringify(logs)); }catch(e){}
+  ST.saved=true;
+}
+/* 统计某个计划练过几次、上次什么时候 */
+function planStats(pid){
+  const ls=getLogs().filter(l=>l.planId===pid);
+  return {count:ls.length, last: ls.length? ls[0].startTs : 0};
+}
+/* 把一条记录变成「可直接粘给 AI」的文本 */
+function logToText(r){
+  const L=[];
+  const d=new Date(r.startTs);
+  L.push('【训练记录】'+d.getFullYear()+'-'+((d.getMonth()+1)<10?'0':'')+(d.getMonth()+1)+'-'+(d.getDate()<10?'0':'')+d.getDate()
+        +' · '+r.planName);
+  L.push('完成度：'+r.doneSteps+'/'+r.totalSteps+' 步'+(r.completed?'（全部完成）':'（中途结束）'));
+  const diff=r.durSec-r.planSec;
+  L.push('计划时长约 '+mmss(r.planSec)+'，实际耗时 '+mmss(r.durSec)+'（'+(diff>=0?'+':'')+diff+'秒）');
+  if(r.skipped && r.skipped.length){
+    L.push('跳过步骤（'+r.skipped.length+'）：'+r.skipped.map(s=>'第'+(s.idx+1)+'步 '+s.label+(s.sec?(' '+s.sec+'秒'):'')).join('；'));
+  }else L.push('跳过步骤：无');
+  if(r.adjusted && r.adjusted.length){
+    L.push('时间调整（'+r.adjusted.length+'）：'+r.adjusted.map(a=>'第'+(a.idx+1)+'步 '+a.label+' '+(a.from!=null?a.from:'?')+'秒→'+a.to+'秒').join('；'));
+  }else L.push('时间调整：无');
+  if(r.stopwatch && r.stopwatch.length){
+    L.push('力竭记录：'+r.stopwatch.map(s=>s.label+' '+s.sec+'秒').join('；'));
+  }
+  L.push('---');
+  L.push('请基于以上实际执行情况评估：强度是否合适、哪些动作需要增减、组间休息要不要调整，并给出下周计划。');
+  return L.join('\n');
+}
+function renderLogs(){
+  const box=document.getElementById('logList'); if(!box) return;
+  const logs=getLogs();
+  if(!logs.length){ box.innerHTML='<div class="empty">还没有训练记录<br>练一次就会自动记在这里</div>'; return; }
+  box.innerHTML = logs.map(r=>{
+    const diff=r.durSec-r.planSec;
+    const meta='完成 '+r.doneSteps+'/'+r.totalSteps+' 步 · 用时 '+mmss(r.durSec)
+      +'（'+(diff>=0?'+':'')+diff+'秒）'
+      +((r.skipped&&r.skipped.length)?(' · 跳过'+r.skipped.length+'步'):'')
+      +((r.adjusted&&r.adjusted.length)?(' · 调时'+r.adjusted.length+'次'):'');
+    return '<div class="logCard">'+
+      '<div class="lh"><span class="ln">'+esc(r.planName)+'</span>'+
+      '<span class="st '+(r.completed?'y':'n')+'">'+(r.completed?'完成':'未完成')+'</span></div>'+
+      '<div class="lm">'+dtStr(r.startTs)+'<br>'+esc(meta)+'</div>'+
+      '<div class="lb"><button class="imp" onclick="copyLog(\''+r.id+'\')">复制给 AI</button>'+
+      '<button onclick="delLog(\''+r.id+'\')">删除</button></div></div>';
+  }).join('');
+}
+function copyLog(id){
+  const r=getLogs().filter(x=>x.id===id)[0]; if(!r) return;
+  const ok=copyText(logToText(r));
+  alert(ok? '已复制，去粘贴给 AI 即可' : '复制失败，请到记录页手动选择文本');
+}
+function delLog(id){
+  let ls=getLogs().filter(x=>x.id!==id);
+  localStorage.setItem('logs',JSON.stringify(ls)); renderLogs();
+}
+function clearLogs(){
+  if(!confirm('确定清空全部训练记录吗？\n此操作不可恢复，建议先到「备份 / 恢复」导出一份。')) return;
+  localStorage.setItem('logs','[]'); renderLogs();
+}
+
+/* =========================================================
+   七、首页渲染 / 自定义计划存取（含同名更新 + 保留 1 版旧版）
    ========================================================= */
 function myPlans(){ try{ return JSON.parse(localStorage.getItem('myPlans')||'[]'); }catch(e){ return []; } }
+function badgeHtml(pid){
+  const st=planStats(pid);
+  if(!st.count) return '<div class="badge none">还没练过</div>';
+  return '<div class="badge">✅ 已完成 '+st.count+' 次 · 上次 '+dtStr(st.last).split(' ')[0]+'</div>';
+}
 function renderHome(){
   const box=document.getElementById('presetList'); box.innerHTML='';
   PRESETS.forEach(g=>{
     box.innerHTML+='<div class="groupTitle">'+esc(g.group)+'</div>';
     g.list.forEach(w=>{
-      box.innerHTML+='<div class="card" onclick="startPreset(\''+w.id+'\')"><div class="t">'+esc(w.name)+'</div><div class="d">'+esc(w.tip||'')+'</div></div>';
+      box.innerHTML+='<div class="card" onclick="startPreset(\''+w.id+'\')"><div class="t">'+esc(w.name)+'</div>'+
+        '<div class="d">'+esc(w.tip||'')+'</div>'+badgeHtml(w.id)+'</div>';
     });
   });
   const cl=document.getElementById('customList'); cl.innerHTML='';
@@ -519,7 +755,8 @@ function renderHome(){
     mine.forEach((w,i)=>{
       cl.innerHTML+='<div class="card" style="display:flex;align-items:center;gap:8px">'+
         '<div style="flex:1" onclick="startCustom('+i+')"><div class="t">'+esc(w.name)+'</div>'+
-        '<div class="d">'+w.items.length+' 个动作</div></div>'+
+        '<div class="d">'+w.items.length+' 个动作'+(w.updatedAt?(' · 更新于 '+dtStr(w.updatedAt)):'')+'</div>'+
+        badgeHtml(w.id)+'</div>'+
         '<button class="del" onclick="delPlan('+i+')">删除</button></div>';
     });
   }
@@ -530,7 +767,7 @@ function startPreset(id){
 function startCustom(i){ startWorkout(myPlans()[i]); }
 function delPlan(i){
   const a=myPlans();
-  if(!confirm('确定删除「'+(a[i] && a[i].name)+'」吗？\n删除后无法恢复。')) return;
+  if(!confirm('确定删除「'+(a[i] && a[i].name)+'」吗？\n删除后无法恢复（训练记录会保留）。')) return;
   a.splice(i,1); localStorage.setItem('myPlans',JSON.stringify(a)); renderHome();
 }
 function savePlan(){
@@ -541,32 +778,98 @@ function savePlan(){
   const p=parsePlan(raw);
   if(!p.items.length){ err.textContent='没识别到任何动作，请对照上方格式检查（比如「深蹲 3x12 休60」）'; err.style.display='block'; return; }
   const steps=expand(p.items);
-  const a=myPlans(); a.unshift(p); localStorage.setItem('myPlans',JSON.stringify(a));
-  ok.textContent='已保存：'+p.name+'（共 '+steps.length+' 步）'; ok.style.display='block';
-  setTimeout(()=>startWorkout(p),500);
+  const a=myPlans();
+  const hit=a.findIndex(w=>w.name===p.name);          // 同名 → 视为更新
+  if(hit>=0){
+    const old=a[hit];
+    p.id=old.id||('u'+Date.now());                    // 沿用原 id，训练记录不会断
+    p.history=[{items:old.items, updatedAt:old.updatedAt||Date.now()}];  // 保留最近 1 版
+    p.updatedAt=Date.now();
+    a[hit]=p;
+    ok.textContent='已更新「'+p.name+'」（共 '+steps.length+' 步）。旧版已保留，可在记录页对比；如需回滚告诉我。';
+  }else{
+    p.id='u'+Date.now(); p.updatedAt=Date.now(); p.history=[];
+    a.unshift(p);
+    ok.textContent='已保存：'+p.name+'（共 '+steps.length+' 步）';
+  }
+  localStorage.setItem('myPlans',JSON.stringify(a));
+  ok.style.display='block';
+  setTimeout(()=>startWorkout(p),700);
 }
 function fillDemo(){
   document.getElementById('cText').value=
 '# 示例 · 全身循环\n深蹲 3x12 休60\n臀桥 3x15 休60\n平板支撑 3x30秒 休60\n单腿臀桥每侧 4x10 休35\n平板支撑 力竭\n@循环 5轮 动休15 轮休0\n开合跳 30秒\n自重深蹲 30秒\n登山跑 30秒\n波比跳 30秒';
 }
-/* ===== 切后台 / 锁屏回来后自动校准 =====
-   手机锁屏或切到别的 App 时，浏览器会暂停 JS，倒计时就冻住了。
-   因为每一步都用「绝对结束时刻」计算，回到前台时会自动把错过的步骤补上，
-   不会把你离开的那段时间白白吞掉。                                    */
+
+/* =========================================================
+   八、备份 / 恢复（换设备、清缓存、分享给别人）
+   ========================================================= */
+function makeBackup(){
+  const data={v:2, exportAt:Date.now(), plans:myPlans(), logs:getLogs()};
+  const txt=JSON.stringify(data,null,1);
+  document.getElementById('ioText').value=txt;
+  const ok=document.getElementById('ioOk'), er=document.getElementById('ioErr');
+  er.style.display='none';
+  ok.textContent='已生成备份（'+data.plans.length+' 个计划 · '+data.logs.length+' 条记录）。点「下载文件」保存，或直接复制文本框内容。';
+  ok.style.display='block';
+  copyText(txt);
+}
+function downloadBackup(){
+  const data={v:2, exportAt:Date.now(), plans:myPlans(), logs:getLogs()};
+  const txt=JSON.stringify(data,null,1);
+  try{
+    const blob=new Blob([txt],{type:'application/json'});
+    const a=document.createElement('a');
+    a.href=URL.createObjectURL(blob);
+    const d=new Date();
+    a.download='训练计时器备份-'+d.getFullYear()+((d.getMonth()+1)<10?'0':'')+(d.getMonth()+1)+(d.getDate()<10?'0':'')+d.getDate()+'.json';
+    document.body.appendChild(a); a.click(); document.body.removeChild(a);
+    setTimeout(()=>URL.revokeObjectURL(a.href),1000);
+  }catch(e){ alert('下载失败：'+e.message); }
+}
+function doImport(){
+  const er=document.getElementById('ioErr'), ok=document.getElementById('ioOk');
+  er.style.display='none'; ok.style.display='none';
+  let data;
+  try{ data=JSON.parse(document.getElementById('ioText').value.trim()); }
+  catch(e){ er.textContent='内容不是有效的备份格式，请确认整段复制完整（以 { 开头、} 结尾）。'; er.style.display='block'; return; }
+  if(!data || (!data.plans && !data.logs)){ er.textContent='没找到计划或记录数据，这不像是本工具的备份。'; er.style.display='block'; return; }
+  const np=(data.plans||[]).length, nl=(data.logs||[]).length;
+  if(!confirm('即将导入 '+np+' 个计划、'+nl+' 条记录。\n同名计划会更新为新版本，记录会合并去重。\n确定继续吗？')) return;
+  // 计划：同名覆盖，其余新增
+  let plans=myPlans();
+  (data.plans||[]).forEach(p=>{
+    const i=plans.findIndex(w=>w.name===p.name);
+    if(i>=0) plans[i]=p; else plans.push(p);
+  });
+  localStorage.setItem('myPlans',JSON.stringify(plans));
+  // 记录：按 id 去重合并
+  let logs=getLogs();
+  const seen={}; logs.forEach(l=>seen[l.id]=1);
+  (data.logs||[]).forEach(l=>{ if(!seen[l.id]){ logs.push(l); seen[l.id]=1; } });
+  logs.sort((a,b)=>b.startTs-a.startTs);
+  if(logs.length>100) logs.length=100;
+  localStorage.setItem('logs',JSON.stringify(logs));
+  ok.textContent='导入完成：'+np+' 个计划、'+nl+' 条记录。'; ok.style.display='block';
+  renderHome();
+}
+
+/* ===== 切后台 / 锁屏回来后自动校准 ===== */
 document.addEventListener('visibilitychange',function(){
   if(document.visibilityState!=='visible') return;
   if(!ST.steps.length) return;
   let guard=0;
   while(ST.run && (ST.endAt-Date.now())<=0 && guard++<300){
-    const endedAt=ST.endAt;          // 这一步"本该结束的时刻"
+    const endedAt=ST.endAt;
     clearInterval(ST.tid); ST.run=false;
-    next(true, endedAt);             // 往下推一步，并以上一步的结束时刻起算
+    next(true, endedAt);
   }
   render(); renderSteps();
 });
 
 /* 启动 */
-if(localStorage.getItem('snd')==='0') document.getElementById('soundChk').checked=false;
+if(localStorage.getItem('snd')==='0')   document.getElementById('soundChk').checked=false;
+if(localStorage.getItem('voice')==='0') document.getElementById('voiceChk').checked=false;
 renderHome();
 </script>
 </body>
